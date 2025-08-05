@@ -1,0 +1,33 @@
+print ("192472077 - bhargava")
+def vacuum_cleaner(location, status):
+    actions = []
+    if status[location] == 'dirty':
+        actions.append(f"Suck at {location}")
+        status[location] = 'clean'
+
+    if location == 'A':
+        actions.append("Move Right to B")
+        location = 'B'
+    else:
+        actions.append("Move Left to A")
+        location = 'A'
+
+    if status[location] == 'dirty':
+        actions.append(f"Suck at {location}")
+        status[location] = 'clean'
+
+    return actions, status
+
+# Initial conditions
+# Status can be 'dirty' or 'clean' for each location
+status = {'A': 'dirty', 'B': 'dirty'}
+location = 'A'  # Starting position
+
+actions, final_status = vacuum_cleaner(location, status.copy())
+
+# Output
+print("Initial status:", status)
+print("Actions taken:")
+for act in actions:
+    print("-", act)
+print("Final status:", final_status)
