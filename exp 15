@@ -1,0 +1,88 @@
+print ("192472077 - bhargava")
+import math
+from collections import Counter
+
+def entropy(data):
+    labels = [row[-1] for row in data]
+    label_counts = Counter(labels)
+    total = len(labels)
+    return -sum((count / total) * math.log2(count / total) for count in label_counts.values())
+
+def split_dataset(data, feature_index, value):
+    return [row for row in data if row[feature_index] == value]
+
+def best_feature_to_split(data):
+    base_entropy = entropy(data)
+    num_features = len(data[0]) - 1
+    best_info_gain = 0
+    best_feature = -1
+
+    for i in range(num_features):
+        values = set(row[i] for row in data)
+        new_entropy = 0
+        for value in values:
+            subset = split_dataset(data, i, value)
+            prob = len(subset) / len(data)
+            new_entropy += prob * entropy(subset)
+        info_gain = base_entropy - new_entropy
+        if info_gain > best_info_gain:
+            best_info_gain = info_gain
+            best_feature = i
+
+    return best_feature
+
+def build_tree(data, features):
+    labels = [row[-1] for row in data]
+    if labels.count(labels[0]) == len(labels):
+        return labels[0]
+    if len(features) == 0:
+        return Counter(labels).most_common(1)[0][0]
+
+    best_feat = best_feature_to_split(data)
+    best_feat_name = features[best_feat]
+    tree = {best_feat_name: {}}
+
+    values = set(row[best_feat] for row in data)
+    for value in values:
+        subset = split_dataset(data, best_feat, value)
+        reduced_features = features[:best_feat] + features[best_feat+1:]
+        reduced_data = [row[:best_feat] + row[best_feat+1:] for row in subset]
+        subtree = build_tree(reduced_data, reduced_features)
+        tree[best_feat_name][value] = subtree
+
+    return tree
+
+def print_tree(tree, indent=''):
+    if isinstance(tree, dict):
+        for key, subtree in tree.items():
+            print(f"{indent}{key}")
+            for value, branch in subtree.items():
+                print(f"{indent}├─ {value} →", end=' ')
+                if isinstance(branch, dict):
+                    print()
+                    print_tree(branch, indent + '│   ')
+                else:
+                    print(branch)
+    else:
+        print(f"{indent}{tree}")
+
+# Example Dataset
+dataset = [
+    ['Sunny', 'Hot', 'High', 'No'],
+    ['Sunny', 'Hot', 'Normal', 'No'],
+    ['Overcast', 'Hot', 'High', 'Yes'],
+    ['Rain', 'Mild', 'High', 'Yes'],
+    ['Rain', 'Cool', 'Normal', 'Yes'],
+    ['Rain', 'Cool', 'Normal', 'No'],
+    ['Overcast', 'Cool', 'Normal', 'Yes'],
+    ['Sunny', 'Mild', 'High', 'No'],
+    ['Sunny', 'Cool', 'Normal', 'Yes'],
+    ['Rain', 'Mild', 'Normal', 'Yes'],
+]
+
+feature_names = ['Outlook', 'Temperature', 'Humidity']
+
+# Build and print the decision tree
+decision_tree = build_tree(dataset, feature_names)
+print("\nDecision Tree Structure:")
+print_tree(decision_tree)
