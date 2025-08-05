@@ -1,0 +1,39 @@
+from collections import deque
+print ("192472077 - bhargava")
+def water_jug_bfs(x, y, target):
+    visited = set()
+    queue = deque()
+
+    queue.append((0, 0, []))  
+
+    while queue:
+        a, b, path = queue.popleft()
+
+        if (a, b) in visited:
+            continue
+        visited.add((a, b))
+
+        path = path + [(a, b)]
+
+        if a == target or b == target:
+            print("Solution found:")
+            for step in path:
+                print("Jug1: {}, Jug2: {}".format(step[0], step[1]))
+            return
+
+        moves = [
+            (x, b),      
+            (a, y),      
+            (0, b),      
+            (a, 0),     
+            (min(a + b, x), max(0, b - (x - a))),  
+            (max(0, a - (y - b)), min(a + b, y)),  
+        ]
+
+        for move in moves:
+            if move not in visited:
+                queue.append((move[0], move[1], path))
+
+    print("No solution.")
+
+water_jug_bfs(4, 3, 2)
