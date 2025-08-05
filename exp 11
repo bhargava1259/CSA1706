@@ -1,0 +1,47 @@
+print ("192472077 - bhargava")
+colors = ['Red', 'Green', 'Blue']
+
+# Adjacency map (Australia example)
+neighbors = {
+    'WA': ['NT', 'SA'],
+    'NT': ['WA', 'SA', 'Q'],
+    'SA': ['WA', 'NT', 'Q', 'NSW', 'V'],
+    'Q': ['NT', 'SA', 'NSW'],
+    'NSW': ['Q', 'SA', 'V'],
+    'V': ['SA', 'NSW', 'T'],
+    'T': ['V']
+}
+
+# Initialize assignment
+def is_valid(assignment, var, value):
+    for neighbor in neighbors[var]:
+        if neighbor in assignment and assignment[neighbor] == value:
+            return False
+    return True
+
+def backtrack(assignment):
+    if len(assignment) == len(neighbors):
+        return assignment
+
+    # Select an unassigned variable
+    unassigned = [v for v in neighbors if v not in assignment]
+    var = unassigned[0]
+
+    for value in colors:
+        if is_valid(assignment, var, value):
+            assignment[var] = value
+            result = backtrack(assignment)
+            if result:
+                return result
+            del assignment[var]
+
+    return None
+
+# Run the CSP solver
+solution = backtrack({})
+if solution:
+    print("Map Coloring Solution:")
+    for region in sorted(solution):
+        print(f"{region}: {solution[region]}")
+else:
+    print("No solution found.")
