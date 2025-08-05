@@ -1,0 +1,63 @@
+from collections import deque
+print ("192472077 - bhargava")
+def is_valid(m_left, c_left, m_right, c_right):
+    # Valid if missionaries are not outnumbered on either bank
+    if m_left < 0 or c_left < 0 or m_right < 0 or c_right < 0:
+        return False
+    if m_left and m_left < c_left:
+        return False
+    if m_right and m_right < c_right:
+        return False
+    return True
+
+def successors(state):
+    m_left, c_left, boat = state
+    m_right = 3 - m_left
+    c_right = 3 - c_left
+    moves = []
+
+    # Possible combinations of people in the boat
+    options = [(1,0), (2,0), (0,1), (0,2), (1,1)]
+
+    for m, c in options:
+        if boat == 'left':
+            new_state = (m_left - m, c_left - c, 'right')
+        else:
+            new_state = (m_left + m, c_left + c, 'left')
+
+        new_m_left, new_c_left, new_boat = new_state
+        new_m_right = 3 - new_m_left
+        new_c_right = 3 - new_c_left
+
+        if is_valid(new_m_left, new_c_left, new_m_right, new_c_right):
+            moves.append(new_state)
+    return moves
+
+def bfs():
+    start = (3, 3, 'left')
+    goal = (0, 0, 'right')
+    queue = deque([(start, [start])])
+    visited = set()
+
+    while queue:
+        state, path = queue.popleft()
+        if state in visited:
+            continue
+        visited.add(state)
+
+        if state == goal:
+            return path
+
+        for succ in successors(state):
+            queue.append((succ, path + [succ]))
+
+    return None
+
+# Run the algorithm
+solution = bfs()
+if solution:
+    print("Solution found in {} moves:".format(len(solution)-1))
+    for step in solution:
+        print(step)
+else:
+    print("No solution.")
