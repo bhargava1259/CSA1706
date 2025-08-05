@@ -1,0 +1,26 @@
+from collections import deque
+print ("192472077 - bhargava")
+
+def bfs(graph, start):
+    visited = set()         # To keep track of visited nodes
+    queue = deque([start])  # Queue for BFS
+
+    while queue:
+        vertex = queue.popleft()  # Remove and return the leftmost item
+        if vertex not in visited:
+            print(vertex, end=" ")  # Process the node (e.g., print it)
+            visited.add(vertex)     # Mark it as visited
+            queue.extend(neighbor for neighbor in graph[vertex] if neighbor not in visited)
+
+# Example usage
+graph = {
+    'A': ['B', 'C'],
+    'B': ['D', 'E'],
+    'C': ['F'],
+    'D': [],
+    'E': ['F'],
+    'F': []
+}
+
+print("BFS traversal starting from vertex A:")
+bfs(graph, 'A')
